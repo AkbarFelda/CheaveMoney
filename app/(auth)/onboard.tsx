@@ -5,6 +5,7 @@ import { colors, spacingY } from "@/constants/theme";
 import { verticalScale } from "@/utils/styling";
 import ScreenWrapper from "@/components/ScreenWrapper";
 import Button from "@/components/Button";
+import Animated, { FadeIn, FadeInDown } from "react-native-reanimated";
 
 const Onboard = () => {
   return (
@@ -15,7 +16,8 @@ const Onboard = () => {
           <TouchableOpacity style={styles.loginButton}>
             <Typo fontweight={"500"}>Sign In</Typo>
           </TouchableOpacity>
-          <Image
+          <Animated.Image
+            entering={FadeIn.duration(1000)}
             source={require("@/assets/images/welcome.png")}
             style={styles.welcomeImage}
             resizeMode="contain"
@@ -23,25 +25,25 @@ const Onboard = () => {
         </View>
         {/* Footer */}
         <View style={styles.footer}>
-          <View style={{ alignItems: "center"}}>
+          <Animated.View entering={FadeInDown.duration(1000).springify().damping(12)} style={{ alignItems: "center"}}>
             <Typo size={30} fontweight={"800"}>Always take control</Typo>
             <Typo size={30} fontweight={"800"}>of your finances</Typo>
-          </View>
+          </Animated.View>
 
-          <View style={{ alignItems: "center", gap: 2 }}>
+          <Animated.View entering={FadeInDown.duration(1000).delay(100).springify().damping(12)} style={{ alignItems: "center", gap: 2}}>
             <Typo size={17} color={colors.textLight}>
               Manage your expenses, track your spending
             </Typo>
             <Typo size={17} color={colors.textLight}>
               and achieve your financial goals with ease
             </Typo>
-          </View>
+          </Animated.View>
           {/* Button */}
-          <View style={styles.buttonContainer}>
+          <Animated.View entering={FadeInDown.duration(1000).delay(200).springify().damping(12)} style={styles.buttonContainer}>
             <Button>
               <Typo size={20} fontweight={"600"} color={colors.neutral900}>Get Started</Typo>
             </Button>
-          </View>
+          </Animated.View>
         </View>
       </View>
     </ScreenWrapper>
@@ -70,7 +72,7 @@ const styles = StyleSheet.create({
   },
 
   footer: {
-    backgroundColor: colors.neutral900,
+    backgroundColor: colors.neutral800,
     alignItems: "center",
     paddingTop: verticalScale(30),
     paddingBottom: verticalScale(45),
