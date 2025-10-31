@@ -6,7 +6,7 @@ import { colors } from '@/constants/theme';
 const {height} = Dimensions.get('window');
 
 const ScreenWrapper = ({style, children}: ScreenWrapperProps) => {
- let paddingTop = Platform.OS === 'android' ? height * 0.02 : 10;
+ let paddingTop = Platform.OS === 'android' ? height * 0.04 : 10;
 
   return (
     <View style={[{paddingTop, flex: 1, backgroundColor: colors.neutral900 }, style]}>
