@@ -11,9 +11,10 @@ const Input = (props: InputProps) => {
     >
       {props.icon && props.icon}
       <TextInput
-        style={[props.style, props.inputStyle]}
+        style={[styles.input, props.inputStyle]}
         placeholderTextColor={colors.neutral400}
         ref={props.inputRef && props.inputRef}
+        {...props}
       />
     </View>
   );
@@ -34,5 +35,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacingx._15,
     gap: spacingx._10,
   },
-  input: {},
+  input: {
+    flex: 1,
+    fontSize: verticalScale(14),
+    color: colors.white,
+  },
 });

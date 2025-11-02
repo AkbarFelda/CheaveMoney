@@ -1,13 +1,48 @@
-import { StyleSheet, Text, View } from "react-native";
-import React from "react";
+import BackButton from "@/components/BackButton";
+import Button from "@/components/Button";
+import Input from "@/components/Input";
 import ScreenWrapper from "@/components/ScreenWrapper";
 import Typo from "@/components/Typo";
 import { colors, spacingY } from "@/constants/theme";
 import { verticalScale } from "@/utils/styling";
-import BackButton from "@/components/BackButton";
-import Input from "@/components/Input";
+import { useRouter } from "expo-router";
+import * as Icons from "phosphor-react-native";
+import React, { useRef, useState } from "react";
+import { Alert, Pressable, StyleSheet, View } from "react-native";
 
 const Login = () => {
+  const emailRef = useRef("");
+  const passwordRef = useRef("");
+  const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter();
+  
+
+  const handleSubmit = async () => {
+    if (!emailRef.current || !passwordRef.current) {
+      Alert.alert('Login',"Please fill all the fields");
+      return;
+    }
+    console.log('email:', emailRef.current);
+    console.log('password:', passwordRef.current);
+    console.log("good to go");
+    // try {
+    //   const response = await fetch("https://example.com/login", {
+    //     method: "POST",
+    //     headers: {
+    //       "Content-Type": "application/json",
+    //     },
+    //     body: JSON.stringify({
+    //       email: emailRef.current,
+    //       password: passwordRef.current,
+    //     }),
+    //   });
+    //   const data = await response.json();
+    //   console.log(data);
+    // } catch (error) {
+    //   console.error(error);
+    // }
+  };
+  
   return (
     <ScreenWrapper>
       <View style={styles.container}>
@@ -25,8 +60,40 @@ const Login = () => {
           <Typo size={16} color={colors.textLighter}>
             Login now to track all your expenses
           </Typo>
-          <Input />
-
+          <Input
+            placeholder="Enter your email"
+            onChangeText={value=> (emailRef.current = value)}
+            icon={
+              <Icons.At size={verticalScale(26)} color={colors.neutral300} />
+            }
+          />
+          <Input
+            placeholder="Enter your password"
+            secureTextEntry
+            onChangeText={value => (passwordRef.current = value)}
+            icon={
+              <Icons.Lock size={verticalScale(26)} color={colors.neutral300} />
+            }
+          />
+          <Typo size={14} color={colors.text} style={{alignSelf: "flex-end"}}>
+            Forgot password?
+          </Typo>
+          <Button loading={isLoading} onPress={handleSubmit}>
+            <Typo size={21} color={colors.black} fontweight="700">
+              Login
+            </Typo>
+          </Button>
+        </View>
+        {/*footer*/}
+        <View style={styles.footer}>
+          <Typo size={15} color={colors.text} style={{alignSelf: "flex-end"}}>
+            Don't have an account?
+          </Typo>
+          <Pressable onPress={() => router.push("/(auth)/register")}>
+            <Typo size={15} fontweight="700" color={colors.primary}>
+              Sign Up
+            </Typo>
+          </Pressable>
         </View>
       </View>
     </ScreenWrapper>
