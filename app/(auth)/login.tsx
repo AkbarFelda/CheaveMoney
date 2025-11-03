@@ -89,7 +89,7 @@ const Login = () => {
           <Typo size={15} color={colors.text} style={{alignSelf: "flex-end"}}>
             Don't have an account?
           </Typo>
-          <Pressable onPress={() => router.push("/(auth)/register")}>
+          <Pressable onPress={() => router.navigate("/(auth)/register")}>
             <Typo size={15} fontweight="700" color={colors.primary}>
               Sign Up
             </Typo>
