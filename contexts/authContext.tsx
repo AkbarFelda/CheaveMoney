@@ -1,17 +1,44 @@
-import { createContext } from "react";
-import { AuthContextType } from "@/types";
+import { createContext, useContext, useEffect, useState } from "react";
+import { AuthContextType, UserType } from "@/types";
+import {
+  createUserWithEmailAndPassword,
+  onAuthStateChanged,
+  signInWithEmailAndPassword,
+} from "firebase/auth";
+import { auth, firestore } from "@/config/firebase";
+import { setDoc, doc, getDoc, updateDoc } from "firebase/firestore";
+import { useRouter } from "expo-router";
 
-const authContext = createContext<AuthContextType | null>(null);
+const AuthContext = createContext<AuthContextType | null>(null);
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<UserType>(null);
+  const router = useRouter();
+
+  useEffect(() => {
+    const unsub = onAuthStateChanged(auth, (FirebaseUser) => {
+      if (FirebaseUser) {
+        setUser({
+          uid: FirebaseUser?.uid,
+          email: FirebaseUser?.email,
+          name: FirebaseUser?.displayName,
+          image: FirebaseUser?.photoURL,
+        });
+        router.replace("/(tabs)");
+      } else {
+        setUser(null);
+        router.replace("/(auth)/onboard");
+      }
+    });
+    return () => unsub();
+  }, []);
 
   const login = async (email: string, password: string) => {
     try {
       await signInWithEmailAndPassword(auth, email, password);
       return { success: true };
     } catch (error) {
-      let msg = error.message;
+      const msg = error instanceof Error ? error.message : String(error);
       return { success: false, msg };
     }
   };
@@ -21,7 +48,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       let response = await createUserWithEmailAndPassword(
         auth,
         email,
-        password,
+        password
       );
       await setDoc(doc(firestore, "users", response?.user?.uid), {
         email,
@@ -30,24 +57,47 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       });
       return { success: true };
     } catch (error) {
-      let msg = error.message;
+      const msg = error instanceof Error ? error.message : String(error);
       return { success: false, msg };
     }
   };
-  
-  const updateUserData = async (uid:string) => {
+
+  const updateUserData = async (uid: string) => {
     try {
       const docRef = doc(firestore, "users", uid);
       const docSnap = await getDoc(docRef);
       if (docSnap.exists()) {
-        await updateDoc(docRef, {
-          email: "newemail@example.com",
-          name: "New Name",
-        });
+        const data = docSnap.data();
+        const userData: UserType = {
+          uid: data.uid,
+          email: data.email || null,
+          name: data.name || null,
+          image: data.image || null,
+        };
+        setUser(userData);
       }
     } catch (error) {
-      let msg = error.message;
-      // return { success: false, msg };
-      console.log('error', error);
+      console.error(error);
     }
   };
+
+  const contextValue: AuthContextType = {
+    user,
+    setUser,
+    register,
+    login,
+    updateUserData,
+  };
+
+  return (
+    <AuthContext.Provider value={contextValue}>{children}</AuthContext.Provider>
+  );
+};
+
+export const useAuth = (): AuthContextType => {
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error("useAuth must be wrapped inside AuthProvider");
+  }
+  return context;
+};

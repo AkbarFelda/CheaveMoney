@@ -4,6 +4,7 @@ import Input from "@/components/Input";
 import ScreenWrapper from "@/components/ScreenWrapper";
 import Typo from "@/components/Typo";
 import { colors, spacingY } from "@/constants/theme";
+import { useAuth } from "@/contexts/authContext";
 import { verticalScale } from "@/utils/styling";
 import { useRouter } from "expo-router";
 import * as Icons from "phosphor-react-native";
@@ -16,35 +17,30 @@ const Register = () => {
   const nameRef = useRef("");
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
-  
+  const { register: registerUser } = useAuth();
 
   const handleSubmit = async () => {
     if (!emailRef.current || !passwordRef.current || !nameRef.current) {
-      Alert.alert('Sign Up',"Please fill all the fields");
+      Alert.alert("Sign Up", "Please fill all the fields");
       return;
     }
-    console.log('email:', emailRef.current);
-    console.log('name:', nameRef.current);
-    console.log('password:', passwordRef.current);
+    setIsLoading(true);
+    const res = await registerUser(
+      emailRef.current,
+      passwordRef.current,
+      nameRef.current,
+    );
+    setIsLoading(false);
+    console.log('register result:', res);
+    if(!res.success){
+      Alert.alert('Sign Up', res.msg);
+    }
+    console.log("email:", emailRef.current);
+    console.log("name:", nameRef.current);
+    console.log("password:", passwordRef.current);
     console.log("good to go");
-    // try {
-    //   const response = await fetch("https://example.com/login", {
-    //     method: "POST",
-    //     headers: {
-    //       "Content-Type": "application/json",
-    //     },
-    //     body: JSON.stringify({
-    //       email: emailRef.current,
-    //       password: passwordRef.current,
-    //     }),
-    //   });
-    //   const data = await response.json();
-    //   console.log(data);
-    // } catch (error) {
-    //   console.error(error);
-    // }
   };
-  
+
   return (
     <ScreenWrapper>
       <View style={styles.container}>
@@ -64,14 +60,14 @@ const Register = () => {
           </Typo>
           <Input
             placeholder="Enter your name"
-            onChangeText={value=> (nameRef.current = value)}
+            onChangeText={(value) => (nameRef.current = value)}
             icon={
               <Icons.User size={verticalScale(26)} color={colors.neutral300} />
             }
           />
           <Input
             placeholder="Enter your email"
-            onChangeText={value=> (emailRef.current = value)}
+            onChangeText={(value) => (emailRef.current = value)}
             icon={
               <Icons.At size={verticalScale(26)} color={colors.neutral300} />
             }
@@ -79,7 +75,7 @@ const Register = () => {
           <Input
             placeholder="Enter your password"
             secureTextEntry
-            onChangeText={value => (passwordRef.current = value)}
+            onChangeText={(value) => (passwordRef.current = value)}
             icon={
               <Icons.Lock size={verticalScale(26)} color={colors.neutral300} />
             }
@@ -92,7 +88,7 @@ const Register = () => {
         </View>
         {/*footer*/}
         <View style={styles.footer}>
-          <Typo size={15} color={colors.text} style={{alignSelf: "flex-end"}}>
+          <Typo size={15} color={colors.text} style={{ alignSelf: "flex-end" }}>
             Already have an account?
           </Typo>
           <Pressable onPress={() => router.navigate("/(auth)/login")}>

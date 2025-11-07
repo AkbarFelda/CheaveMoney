@@ -20,6 +20,7 @@ const Input = (props: InputProps) => {
   );
 };
 
+
 export default Input;
 
 const styles = StyleSheet.create({
